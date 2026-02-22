@@ -1,0 +1,66 @@
+resources:
+  jobs:
+    DW_E_commerce:
+      name: DW E-commerce
+      tasks:
+        - task_key: silver_dim_customer_scd
+          sql_task:
+            query:
+              query_id: 8a4767d8-41c7-4ce9-8971-b409c86881fd
+            warehouse_id: 0407131a5b1ee7c4
+        - task_key: gold_dim_cliente_scd
+          depends_on:
+            - task_key: silver_dim_customer_scd
+          sql_task:
+            query:
+              query_id: 87bfb9e5-1758-4e05-a09c-34168d838aef
+            warehouse_id: 0407131a5b1ee7c4
+        - task_key: gold_dim_clientes
+          depends_on:
+            - task_key: silver_dim_customer_scd
+          sql_task:
+            query:
+              query_id: ef64bd45-1e13-4a1e-875b-e513a7e262cb
+            warehouse_id: 0407131a5b1ee7c4
+        - task_key: silver_order_items_clean
+          sql_task:
+            query:
+              query_id: 7597f6fd-8294-433d-8aff-bcf6fcbb682f
+            warehouse_id: 0407131a5b1ee7c4
+        - task_key: silver_orders_clean
+          sql_task:
+            query:
+              query_id: 4d190a86-b006-43f2-bd8c-f6ad15355376
+            warehouse_id: 0407131a5b1ee7c4
+        - task_key: gold_dim_tempo
+          depends_on:
+            - task_key: silver_orders_clean
+          sql_task:
+            query:
+              query_id: 84e132db-87ff-464a-83a7-78f97523a339
+            warehouse_id: 0407131a5b1ee7c4
+        - task_key: silver_products_clean
+          sql_task:
+            query:
+              query_id: e918a72a-8a74-4af9-a053-fc6ea61cf4ad
+            warehouse_id: 0407131a5b1ee7c4
+        - task_key: gold_dim_produto
+          depends_on:
+            - task_key: silver_products_clean
+          sql_task:
+            query:
+              query_id: 49e6e929-b76b-4aa7-87a5-4adc373f21b8
+            warehouse_id: 0407131a5b1ee7c4
+        - task_key: gold_fact_vendas
+          depends_on:
+            - task_key: gold_dim_tempo
+            - task_key: gold_dim_cliente_scd
+            - task_key: silver_orders_clean
+            - task_key: silver_order_items_clean
+            - task_key: gold_dim_produto
+          sql_task:
+            query:
+              query_id: 6f24b95b-fce5-400f-8978-aa85ca3d0f55
+            warehouse_id: 0407131a5b1ee7c4
+      queue:
+        enabled: true
